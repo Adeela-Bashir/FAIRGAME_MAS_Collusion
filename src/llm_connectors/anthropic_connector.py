@@ -1,25 +1,76 @@
-from anthropic import Anthropic
+from openai import OpenAI
 import os
+
+#Gemma
 
 from src.llm_connectors.abstract_connector import AbstractConnector
 
+
 class AnthropicConnector(AbstractConnector):
     """
-    Chat model implementation for the Claude API (Anthropic).
+    OpenRouter connector used in place of Anthropic.
+    Allows using Google Gemma (or other OpenRouter models)
+    while preserving FAIRGAME connector interface.
     """
 
-    def __init__(self, provider_model: str, max_tokens: int = 1024):
+    def __init__(self, provider_model: str, max_tokens: int = 1024, temperature: float = 1.0):
         self.api_key = os.getenv("API_KEY_ANTHROPIC")
+
         if not self.api_key:
             raise EnvironmentError("API_KEY_ANTHROPIC not found in environment variables.")
-        self.provider_model = provider_model
+
+        # Default to Gemma free model if not provided
+        #self.provider_model = provider_model or "google/gemma-3-27b-it:free"
+        self.provider_model = provider_model or "openrouter/free"
+
         self.max_tokens = max_tokens
-        self.client = Anthropic(api_key=self.api_key)
+        self.temperature = temperature
+
+        self.client = OpenAI(
+            api_key=self.api_key,
+            base_url="https://openrouter.ai/api/v1",
+            default_headers={
+                "HTTP-Referer": "http://localhost",
+                "X-Title": "FAIRGAME_MAS_Collusion"
+            }
+        )
 
     def send_prompt(self, prompt: str) -> str:
-        response = self.client.messages.create(
-            max_tokens=self.max_tokens,
-            messages=[{"role": "user", "content": prompt}],
+        messages = [{"role": "user", "content": prompt}]
+
+        completion = self.client.chat.completions.create(
             model=self.provider_model,
+            temperature=self.temperature,
+            max_tokens=self.max_tokens,
+            messages=messages
         )
-        return response.content[0].text
+
+        return completion.choices[0].message.content
+
+
+
+# from anthropic import Anthropic
+# import os
+
+# from src.llm_connectors.abstract_connector import AbstractConnector
+
+# class AnthropicConnector(AbstractConnector):
+#     """
+#     Chat model implementation for the Claude API (Anthropic).
+#     """
+
+#     def __init__(self, provider_model: str, max_tokens: int = 1024):
+#         self.api_key = os.getenv("API_KEY_ANTHROPIC")
+#         if not self.api_key:
+#             raise EnvironmentError("API_KEY_ANTHROPIC not found in environment variables.")
+#         self.provider_model = provider_model
+#         self.max_tokens = max_tokens
+#         self.client = Anthropic(api_key=self.api_key)
+
+#     def send_prompt(self, prompt: str) -> str:
+#         response = self.client.messages.create(
+#             max_tokens=self.max_tokens,
+#             messages=[{"role": "user", "content": prompt}],
+#             model=self.provider_model,
+#         )
+#         return response.content[0].text

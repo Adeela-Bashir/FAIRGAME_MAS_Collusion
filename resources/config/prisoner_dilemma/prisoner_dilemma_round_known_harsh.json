@@ -1,5 +1,6 @@
 {
     "name": "Prisoner's Dilemma",
+    "description": "Baseline prisoner's dilemma with known rounds_harsh",
     "nRounds": 1,
     "nRoundsIsKnown": true,
     "llm": "MistralLarge",

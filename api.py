@@ -5,6 +5,13 @@ from flask import Flask, jsonify, request
 from src.fairgame_factory import FairGameFactory
 from src.results_processing.results_processor import ResultsProcessor
 
+from dotenv import load_dotenv
+load_dotenv()
+
+print("OPENAI key set:", bool(os.getenv("API_KEY_OPENAI")))
+print("MISTRAL key set:", bool(os.getenv("API_KEY_MISTRAL")))
+print("ANTHROPIC key set:", bool(os.getenv("API_KEY_ANTHROPIC")))
+
 class S3Uploader:
     """Handles the logic for uploading files to an S3-compatible storage."""
 
@@ -132,10 +139,19 @@ fair_game_api = FairGameAPI(s3_uploader)
 
 @app.route('/create_and_run_games', methods=['POST'])
 def create_and_run_games_route():
-    """Flask route for creating and running games."""
-    config = request.json
-    json_data = fair_game_api.create_and_run_games(config)
-    return jsonify(json_data), 200
+    try:
+        config = request.json
+        json_data = fair_game_api.create_and_run_games(config)
+        return jsonify(json_data), 200
+    except Exception as e:
+        return jsonify({"error": str(e), "type": e.__class__.__name__}), 500
+
+# @app.route('/create_and_run_games', methods=['POST'])
+# def create_and_run_games_route():
+#     """Flask route for creating and running games."""
+#     config = request.json
+#     json_data = fair_game_api.create_and_run_games(config)
+#     return jsonify(json_data), 200
 
 @app.route('/health', methods=['GET'])
 def health_check_route():

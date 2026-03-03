@@ -67,7 +67,16 @@ class GamesRunner:
         Execute the game by sending a POST request to the FairGame API.
         """
         response = requests.post(self.fairgame_url, json=self.config, headers=HEADERS)
-        return response.json()
+        #return response.json()
+        # If server returned an error, show it clearly
+        if not response.ok:
+            raise RuntimeError(f"Server error {response.status_code}:\n{response.text}")
+
+        # Try to parse JSON; if not JSON, print raw text
+        try:
+            return response.json()
+        except Exception:
+            raise RuntimeError(f"Non-JSON response from server:\n{response.text}")
 
 def parse_call_type(argv: list) -> str:
     """

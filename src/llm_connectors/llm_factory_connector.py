@@ -1,19 +1,39 @@
-
 from dotenv import load_dotenv
 from src.llm_connectors.anthropic_connector import AnthropicConnector
 from src.llm_connectors.mistral_connector import MistralConnector
 from src.llm_connectors.openai_connector import OpenAIConnector
 
-# Load environment variables from a .env file
 load_dotenv()
 
-# Dictionary mapping our abstract model names to provider classes and their corresponding provider model identifiers.
 MODEL_PROVIDER_MAP = {
-    "Claude35Haiku": (AnthropicConnector, "claude-3-5-haiku-20241022"),
-    "MistralLarge": (MistralConnector, "mistral-large-latest"),
-    "OpenAIGPT4o": (OpenAIConnector, "gpt-4o"),
-    # Add more mappings as needed.
+    # Keep the same "abstract names" used by your JSON configs,
+    # but route them to OpenRouter models now:
+
+    # Claude35Haiku -> Gemma (free)
+    "Claude35Haiku": (AnthropicConnector, "openrouter/free"),
+
+    # MistralLarge -> Llama (free)
+    "MistralLarge": (MistralConnector, "openrouter/free"),
+
+    # OpenAIGPT4o -> OpenRouter free router (safest baseline)
+    "OpenAIGPT4o": (OpenAIConnector, "openrouter/free"),
 }
+
+# from dotenv import load_dotenv
+# from src.llm_connectors.anthropic_connector import AnthropicConnector
+# from src.llm_connectors.mistral_connector import MistralConnector
+# from src.llm_connectors.openai_connector import OpenAIConnector
+
+# # Load environment variables from a .env file
+# load_dotenv()
+
+# # Dictionary mapping our abstract model names to provider classes and their corresponding provider model identifiers.
+# MODEL_PROVIDER_MAP = {
+#     "Claude35Haiku": (AnthropicConnector, "claude-3-5-haiku-20241022"),
+#     "MistralLarge": (MistralConnector, "mistral-large-latest"),
+#     "OpenAIGPT4o": (OpenAIConnector, "gpt-4o"),
+#     # Add more mappings as needed.
+# }
 
 class ChatModelFactory:
     """

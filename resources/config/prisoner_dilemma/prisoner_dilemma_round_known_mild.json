@@ -1,5 +1,6 @@
 {
     "name": "Prisoner's Dilemma",
+    "description": "Baseline prisoner's dilemma with known rounds",
     "nRounds": 1,
     "nRoundsIsKnown": true,
     "llm": "Claude35Haiku",

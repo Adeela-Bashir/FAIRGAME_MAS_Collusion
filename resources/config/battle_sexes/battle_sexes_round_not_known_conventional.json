@@ -1,5 +1,6 @@
 {
     "name": "Battle of sexes",
+    "description": "Baseline Battle of sexes with not known rounds conventional",
     "nRounds": 10,
     "nRoundsIsKnown": false,
     "llm": "MistralLarge",
